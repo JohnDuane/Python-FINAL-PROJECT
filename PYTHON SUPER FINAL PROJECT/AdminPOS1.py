@@ -15,11 +15,11 @@ class menu:
         self.window.setGeometry(0, 0, 1366, 768)
         self.window.setStyleSheet("background-color: #242222")
         
-        # --- State Variables ---
-        self.selected_table = None # 'Product' or 'Sales'
-        self.selected_product_data = None # Data of selected Product row
-        self.selected_sale_data = None    # Data of selected Sale row
-        # -----------------------
+        # =====State Variables=====
+        self.selected_table = None 
+        self.selected_product_data = None
+        self.selected_sale_data = None   
+        # =========================
 
         read = QPushButton("EXIT", self.window)
         read.setFont(QFont("Ethnocentric", 15))
@@ -27,7 +27,7 @@ class menu:
         read.setStyleSheet("border-radius: 10px; background-color: lightgray; color: #2742DE")
         read.clicked.connect(self.window.close)
 
-
+#MAIN PANEL PART
         panel = QFrame(self.window)
         panel.setStyleSheet("background-color: #D4D8FB")
         panel.setGeometry(15, 15, 1025, 630)
@@ -36,7 +36,7 @@ class menu:
         midpanel.setGeometry(497, 0, 30, 630)
         midpanel.setStyleSheet("background-color: #242222")
 
-        
+
 
         category = QLabel(panel)
         category.setText("CATEGORY:")
@@ -103,16 +103,16 @@ class menu:
             reply = QMessageBox.question(
                self.window, 
                "Confirm Clear History", 
-               "Are you sure you want to delete all sales records?",
+               f"<font color='white'>Are you sure you want to delete all sales records?",
                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No
             )
             if reply == QMessageBox.Yes:
                try:
                   self.database.clear_sales_history()
                   self.loadSalesHistory()
-                  QMessageBox.information(self.window, "Success", "All sales history has been cleared.")
+                  QMessageBox.information(self.window, "Success", f"<font color='white'>All sales history has been cleared.")
                except Exception as e:
-                  QMessageBox.critical(self.window, "Error", f"Failed to clear sales history: {e}")
+                  QMessageBox.critical(self.window, "Error", f"<font color='white'>Failed to clear sales history: {e}")
 
         clear_history.clicked.connect(clearSalesHistory)
 
@@ -135,7 +135,7 @@ class menu:
         font-weight: bold;
         border: 1px solid gray;
         padding: 5px;
-    }""")
+        }""")
         table.setModel(model)
         self.table = table
         self.model = model
@@ -159,7 +159,7 @@ class menu:
         font-weight: bold;
         border: 1px solid gray;
         padding: 5px;
-    }""")
+        }""")
         table2.setModel(model2)
         self.table2 = table2
         self.model2 = model2
@@ -226,7 +226,8 @@ class menu:
                 quantity = int(self.quanField.text())
                 price = float(self.priceField.text())
             except ValueError:
-                QMessageBox.warning(self.window, "Input Error", "Quantity must be an integer and Price must be a number.")
+                QMessageBox.warning(self.window, "Input Error", f"<font color='white'>Quantity must be an integer and Price must be a number.")
+                
                 return
 
             total = quantity * price
@@ -278,7 +279,7 @@ class menu:
         h2.setGeometry(719, 15, 150, 50)
         h2.setFont(QFont("Ethnocentric", 15))
 
-        # --- Connect Table Clicks to Handlers ---
+        # -Connect Table Clicks to Handlers-
         self.table.clicked.connect(self.product_row_clicked)
         self.table2.clicked.connect(self.sales_row_clicked)
 
@@ -288,7 +289,6 @@ class menu:
     def product_row_clicked(self, index):
         """Called when a row in the Product (Stock) table is clicked."""
         
-        # --- CRITICAL FIX: Ensure the row is selected in the selection model ---
         self.table2.clearSelection() 
         self.table.selectionModel().select(
             index.siblingAtRow(index.row()), QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
@@ -316,7 +316,7 @@ class menu:
     def sales_row_clicked(self, index):
         """Called when a row in the Sales (History) table is clicked."""
         
-        # --- CRITICAL FIX: Ensure the row is selected in the selection model ---
+        # CRITICAL FIX: Ensure the row is selected in the selection model 
         self.table.clearSelection() 
         self.table2.selectionModel().select(
             index.siblingAtRow(index.row()), QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
@@ -344,7 +344,7 @@ class menu:
         """Updates the selected Product record in the database."""
         
         if self.selected_table != 'Product' or not self.selected_product_data:
-            QMessageBox.warning(self.window, "Warning", "Please select a **Product** row and enter new values to update.")
+            QMessageBox.warning(self.window, "Warning", f"<font color='white'>Please select a **Product** row and enter new values to update.")
             return
 
         try:
@@ -360,7 +360,7 @@ class menu:
             self.database.update_product_details(
                 old_product_name, category, product, price, quantity, total
             )
-            QMessageBox.information(self.window, "Success", f"Product '{old_product_name}' updated successfully.")
+            QMessageBox.information(self.window, "Success", f"<font color='white'>Product '{old_product_name}' updated successfully.")
             self.loadProducts() 
             
             # Reset state and fields
@@ -372,49 +372,45 @@ class menu:
             self.table.clearSelection() 
             
         except ValueError:
-            QMessageBox.critical(self.window, "Error", "Invalid data. Quantity must be an integer and Price must be a number.")
+            QMessageBox.critical(self.window, "Error", f"<font color='white'>Invalid data. Quantity must be an integer and Price must be a number.")
         except Exception as e:
-            QMessageBox.critical(self.window, "Error", f"An error occurred during update: {e}")
+            QMessageBox.critical(self.window, "Error", f"<font color='white'>An error occurred during update: {e}")
 
 
     def deleteData(self):
         """Deletes the selected record from either Product or Sales table."""
         
-        # This check confirms that a row has been clicked and state variables set.
         if not self.selected_table:
             QMessageBox.warning(self.window, "Warning", "Please **click/select a row** from either table (Stock or History) to delete.")
             return
             
         reply = QMessageBox.question(self.window, 'Confirm Delete',
-            "Are you sure you want to permanently delete the selected record?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            f"<font color='white'>Are you sure you want to permanently delete the selected record?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
         if reply == QMessageBox.No:
             return
 
         try:
             if self.selected_table == 'Product':
-                # Ensure we have the necessary data
                 if not self.selected_product_data:
-                     raise ValueError("Product data not properly loaded for deletion.")
+                     raise ValueError(f"<font color='white'>Product data not properly loaded for deletion.")
                 
                 product_name = self.selected_product_data[1]
                 self.database.delete_product(product_name)
-                QMessageBox.information(self.window, "Success", f"Product '{product_name}' removed from **Stock**.")
+                QMessageBox.information(self.window, "Success", f"<font color='white'>Product '{product_name}' removed from **Stock**.")
                 self.loadProducts()
 
             elif self.selected_table == 'Sales':
-                # Ensure we have the necessary data
                 if not self.selected_sale_data:
-                    raise ValueError("Sale data not properly loaded for deletion.")
+                    raise ValueError(f"<font color='white'>Sale data not properly loaded for deletion.")
                     
                 date = self.selected_sale_data[0]
                 product_name = self.selected_sale_data[1]
                 quantity = int(self.selected_sale_data[3]) 
                 self.database.delete_sale(date, product_name, quantity)
-                QMessageBox.information(self.window, "Success", f"Sale record for '{product_name}' deleted from **History**.")
+                QMessageBox.information(self.window, "Success", f"<font color='white'>Sale record for '{product_name}' deleted from **History**.")
                 self.loadSalesHistory() 
 
-            # Reset selection state and clear fields
             self.selected_table = None
             self.selected_product_data = None
             self.selected_sale_data = None
@@ -425,9 +421,9 @@ class menu:
             self.table2.clearSelection()
 
         except ValueError as ve:
-             QMessageBox.critical(self.window, "Error", f"Deletion failed: {ve}")
+             QMessageBox.critical(self.window, "Error", f"<font color='white'>Deletion failed: {ve}")
         except Exception as e:
-            QMessageBox.critical(self.window, "Error", f"An error occurred during deletion: {e}")
+            QMessageBox.critical(self.window, "Error", f"<font color='white'>An error occurred during deletion: {e}")
 
 
     def home(self):
